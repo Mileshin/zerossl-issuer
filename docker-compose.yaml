@@ -1,0 +1,13 @@
+version: '3'
+services:
+  certificate-manager-init:
+    build:
+      context: ./  
+      dockerfile: Dockerfile  
+    environment:
+      ZEROSSL_API_KEY: ""
+      LOG_LEVEL: "DEBUG"
+      EXTERNAL_IP: ""
+      RENEWAL_THRESHOLD_DAYS: 14
+    volumes:
+      - ./certs:/certs

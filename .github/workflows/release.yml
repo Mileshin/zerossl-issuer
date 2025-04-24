@@ -1,0 +1,44 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-docker-image:
+    uses: ./.github/workflows/__docker-build.yml
+    with:
+      tag: ${{ github.ref_name }}
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+
+      - name: Read CHANGELOG.md
+        id: read_changelog
+        run: |
+          echo "## What's Changed" > release_body.md
+          cat CHANGELOG.md >> release_body.md
+          echo -e "\n\n[Docker Hub](https://hub.docker.com/r/${{ secrets.DOCKERHUB_USERNAME }}/zerossl-issuer)" >> release_body.md
+
+      - name: Read release body
+        id: read_body
+        run: echo "RELEASE_BODY<<EOF" >> $GITHUB_ENV && cat release_body.md >> $GITHUB_ENV && echo "EOF" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body: ${{ env.RELEASE_BODY }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

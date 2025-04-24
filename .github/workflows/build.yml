@@ -1,0 +1,21 @@
+name: Docker Build and Push
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'feature/*'
+      - 'fix/*'
+
+
+permissions:
+  contents: write
+
+jobs:
+  build-docker-image:
+    uses: ./.github/workflows/__docker-build.yml
+    with:
+      tag: ${{ github.ref_name == 'main' && 'latest' || format('{0}-{1}', github.ref_name, github.sha) }}
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
