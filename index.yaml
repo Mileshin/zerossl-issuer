@@ -1,0 +1,13 @@
+apiVersion: v1
+entries:
+  zerossl-cert-manager:
+  - apiVersion: v2
+    appVersion: v1.0.0
+    created: "2025-04-24T15:29:29.318990346Z"
+    description: A Helm chart for deploying a CronJob to manage certificates via DaemonSet
+    digest: 7016a660bc701604d8fafa6bb4c33f31f8b63177c0d937ef76e990ae41d05da1
+    name: zerossl-cert-manager
+    urls:
+    - https://github.com/Mileshin/zerossl-issuer/releases/download/zerossl-cert-manager-0.1.0/zerossl-cert-manager-0.1.0.tgz
+    version: 0.1.0
+generated: "2025-04-24T15:29:29.319222684Z"
