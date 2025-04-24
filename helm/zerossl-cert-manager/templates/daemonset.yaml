@@ -1,0 +1,3 @@
+{{ if eq .Values.type "daemonset" }}
+{{ include "zerossl_cert_manager.daemonset" . }}
+{{- end -}}

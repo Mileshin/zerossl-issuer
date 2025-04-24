@@ -1,0 +1,5 @@
+apiVersion: v2
+name: zerossl-cert-manager
+description: A Helm chart for deploying a CronJob to manage certificates via DaemonSet
+version: 0.1.0
+appVersion: "v1.0.0"

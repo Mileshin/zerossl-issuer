@@ -1,0 +1,26 @@
+{{ if eq .Values.type "cronjob" }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ (include "zerossl_cert_manager.fullname" .) }}-cleanup
+  namespace: {{ include "zerossl_cert_manager.namespace" . }}
+  labels:
+    {{- include "zerossl_cert_manager.metaLabels" . | nindent 4 }}
+    app.kubernetes.io/component: cleanup-daemonset
+  annotations:
+    "helm.sh/hook": "pre-delete"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+spec:
+  ttlSecondsAfterFinished: 60
+  template:
+    spec:
+      containers:
+        - name: cleanup
+          image: {{ .Values.image.kubectl }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              kubectl -n {{ include "zerossl_cert_manager.namespace" . }} delete daemonset zerossl-cert-manager-{{ (include "zerossl_cert_manager.fullname" .) }} || true
+      restartPolicy: Never
+{{- end -}}

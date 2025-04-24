@@ -1,0 +1,33 @@
+{{ if eq .Values.type "cronjob" }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ (include "zerossl_cert_manager.fullname" .) }}-cronjob
+  namespace: {{ include "zerossl_cert_manager.namespace" . }}
+  labels:
+    {{- include "zerossl_cert_manager.metaLabels" . | nindent 4 }}
+    app.kubernetes.io/component: zerossl-cert-manager
+spec:
+  schedule: {{ .Values.cronjob.schedule }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: setup-daemonset
+              image: {{ .Values.image.kubectl }}
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  kubectl apply -f - <<EOF
+                  {{ include "zerossl_cert_manager.daemonset" . | nindent 18 }}
+                  EOF
+            - name: cleanup-daemonset
+              image: {{ .Values.image.kubectl }}
+              command:
+                - /bin/sh
+                - -c
+                - "echo wait {{ .Values.cronjob.sleepDuration }} seconds before cleanup; sleep {{ .Values.cronjob.sleepDuration }}; kubectl -n {{ include "zerossl_cert_manager.namespace" . }} delete daemonset zerossl-cert-manager-{{ (include "zerossl_cert_manager.fullname" .) }}"
+{{- end -}}

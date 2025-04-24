@@ -1,0 +1,15 @@
+
+{{ if eq .Values.type "cronjob" }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ include "zerossl_cert_manager.namespace" . }}
+  name: {{ (include "zerossl_cert_manager.fullname" .) }}-role
+  labels:
+    {{- include "zerossl_cert_manager.metaLabels" . | nindent 4 }}
+    app.kubernetes.io/component: zerossl-cert-manager
+rules:
+  - apiGroups: ["apps"]
+    resources: ["daemonsets"]
+    verbs: ["get", "list", "create", "delete"]
+{{- end -}}

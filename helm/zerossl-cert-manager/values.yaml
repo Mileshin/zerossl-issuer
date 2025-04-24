@@ -1,0 +1,51 @@
+### Override namepsace for gigaspace chart resources. By default, the chart creates resources in the release namespace.
+namespace: ""
+
+### Override only chart name part of prefix for resources
+### nameOverride: "zerossl-cert-manager"
+### Override name prefix for resources
+#fullnameOverride: "zerossl-cert-manager"
+
+### Add metalables 
+#metaLabels: {}
+
+image:
+  repository: andreymileshin/zerossl-issuer
+  #tag: latest
+  kubectl: bitnami/kubectl:1.29
+
+# Type of worker. Posiible value cronjob or daemonset
+type: daemonset
+
+imagePullSecrets:
+  - name: k8s-group-registry-secret
+
+cronjob:
+  schedule: "49 15 * * *"  # Runs at midnight every day
+  sleepDuration: 300  # Duration to wait before deleting the DaemonSet (in seconds)
+
+daemonset:
+  activeDeadlineSeconds: 86400
+
+env:
+  ZEROSSL_API_KEY: ""
+  LOG_LEVEL: "INFO"
+  RENEWAL_THRESHOLD_DAYS: "14"
+
+nodeSelector:
+  role: "worker"
+
+tolerations:
+  - key: "worker"
+    operator: "Equal"
+    value: "enabled"
+    effect: "NoSchedule"
+
+# hostNetwork or hostPort
+networkMode: "hostNetwork"
+
+priorityClass:
+  enabled: true
+  name: "zerossl-priority"
+  value: 1000000
+
